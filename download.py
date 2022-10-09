@@ -12,6 +12,8 @@ from pygelbooru.gelbooru import GelbooruImage
 
 def main():
     parser = argparse.ArgumentParser(description="Download images from Gelbooru/Rule34")
+    parser.add_argument("--output", help="Output directory", required=True)
+    parser.add_argument("--tags", help="Tags to search for", nargs="+", required=True)
     parser.add_argument(
         "--source",
         help="Source site",
@@ -19,8 +21,6 @@ def main():
         default="gelbooru",
         choices=["gelbooru", "rule34"],
     )
-    parser.add_argument("--tags", help="Tags to search for", nargs="+")
-    parser.add_argument("--output", help="Output directory")
     parser.add_argument("--page", help="Page to start from", type=int, default=0)
     parser.add_argument(
         "--parallel", help="Number of parallel downloads", type=int, default=5
