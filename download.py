@@ -15,6 +15,9 @@ def main():
     parser.add_argument("--output", help="Output directory", required=True)
     parser.add_argument("--tags", help="Tags to search for", nargs="+", required=True)
     parser.add_argument(
+        "--exclude-tags", help="Tags to exclude from searching", nargs="+",
+    )
+    parser.add_argument(
         "--source",
         help="Source site",
         type=str,
@@ -40,18 +43,34 @@ def main():
 
     print("Preparing for downloading images...")
     asyncio.run(
-        download_all_images(gelbooru, args.tags, args.output, args.page, args.parallel),
+        download_all_images(
+            gelbooru,
+            args.tags,
+            args.exclude_tags,
+            args.output,
+            args.page,
+            args.parallel,
+        ),
         debug=True,
     )
 
+    print("Finished.")
+
 
 async def download_all_images(
-    gelbooru: Gelbooru, tags: list[str], output_dir: str, start_page: int, parallel: int
+    gelbooru: Gelbooru,
+    tags: list[str],
+    exclude_tags: list[str],
+    output_dir: str,
+    start_page: int,
+    parallel: int,
 ):
     LIMIT = 100
     page = start_page
     while True:
-        count = await download_images(gelbooru, tags, output_dir, LIMIT, page, parallel)
+        count = await download_images(
+            gelbooru, tags, exclude_tags, output_dir, LIMIT, page, parallel
+        )
         if count == 0:
             break
         page += 1
@@ -60,6 +79,7 @@ async def download_all_images(
 async def download_images(
     gelbooru: Gelbooru,
     tags: list[str],
+    exclude_tags: list[str],
     output_dir: str,
     limit: int,
     page: int,
@@ -68,7 +88,9 @@ async def download_images(
     print(f"Searching posts: page={page}")
     image_or_images: Union[
         list[GelbooruImage], GelbooruImage
-    ] = await gelbooru.search_posts(tags=tags, limit=limit, page=page)
+    ] = await gelbooru.search_posts(
+        tags=tags, exclude_tags=exclude_tags, limit=limit, page=page
+    )
 
     images: list[GelbooruImage]
     if isinstance(image_or_images, list):
