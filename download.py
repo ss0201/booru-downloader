@@ -89,6 +89,11 @@ async def download_images(
 
 
 def download_image(output_dir: str, image: GelbooruImage):
+    output_path = os.path.join(output_dir, image.filename)
+    if os.path.exists(output_path):
+        print(f"Skipping {image.file_url}")
+        return
+
     print(f"Downloading {image.file_url}")
     response = requests.get(image.file_url, timeout=(10, 30))
 
@@ -98,7 +103,6 @@ def download_image(output_dir: str, image: GelbooruImage):
         )
         return
 
-    output_path = os.path.join(output_dir, image.filename)
     with open(output_path, "wb") as f:
         f.write(response.content)
     print(f"Downloaded to {output_path}")
