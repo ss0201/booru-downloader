@@ -31,7 +31,7 @@ def main():
     args = parser.parse_args()
 
     with open("credentials.json", "r") as f:
-        credentials = json.loads(f.read())
+        credentials: dict[str, dict[str, str]] = json.loads(f.read())
 
     print("Creating Gelbooru client...")
     api: str = API_GELBOORU
@@ -39,7 +39,9 @@ def main():
         api = API_GELBOORU
     elif args.source == "rule34":
         api = API_RULE34
-    gelbooru = Gelbooru(credentials["api_key"], credentials["user_id"], api=api)
+    api_key = credentials[args.source].get("api_key")
+    user_id = credentials[args.source].get("user_id")
+    gelbooru = Gelbooru(api_key, user_id, api=api)
 
     print("Preparing for downloading images...")
     asyncio.run(
