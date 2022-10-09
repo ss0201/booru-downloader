@@ -83,7 +83,7 @@ async def download_images(
             executor.submit(download_image, output_dir, image) for image in images
         ]
         for future in futures:
-            future.result(timeout=60)
+            future.result()
 
     return len(images)
 
